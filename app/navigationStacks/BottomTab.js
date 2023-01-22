@@ -4,13 +4,14 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import HomeTab from '../screenTabs/HomeTab';
 import Market from '../screenTabs/MarketTab';
+import Profile from '../screenTabs/ProfileTab';
 
 import Post from '../screenTabs/PostTab';
 
 import ChatStack from './ChatStack';
 import ServicesStack from './ServicesStack';
+import ProfileStack from './ProfileStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -38,7 +39,7 @@ const BottomTab = () => {
           return <Ionicons name={iconName} size={size} color={color} />;
         },
 
-        tabBarActiveTintColor: 'red',
+        tabBarActiveTintColor: '#e63629',
         tabBarInactiveTintColor: 'grey',
       })}>
       <Tab.Screen
@@ -59,6 +60,11 @@ const BottomTab = () => {
       <Tab.Screen
         name={'Messages'}
         component={ChatStack}
+        options={{headerShown: false}}
+      />
+      <Tab.Screen
+        name={'Profile'}
+        component={ProfileStack}
         options={{headerShown: false}}
       />
     </Tab.Navigator>
