@@ -4,19 +4,72 @@ import FinalMe from '../assets/FinalMe.png';
 import DeliveryPhoto from '../assets/DeliveryPhoto.jpg';
 import Cookies from '../assets/Cookies.jpg';
 import {useNavigation} from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
-const Service = () => {
+const Service = ({
+  uid,
+  username,
+  userImage,
+  title,
+  description,
+  price,
+  serviceImage,
+  userBio,
+}) => {
   const navigation = useNavigation();
+  // console.log(userBio);
 
-  return (
-    <View>
-      <TouchableOpacity onPress={() => navigation.navigate('StoreProfile')}>
+  const user = auth().currentUser;
+  const handleDelete = () => {
+    firestore()
+      .collection('services')
+      .doc(title)
+      .delete()
+      .then(() => {
+        console.log('service deleted!');
+      });
+  };
+  if (uid === user.uid) {
+    return (
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('StoreProfile', {
+            username: username,
+            userImage: userImage,
+            userBio: userBio,
+          })
+        }>
         <View style={styles.container}>
-          <View style={styles.headerContainer}>
-            <Image style={styles.profileImage} source={FinalMe} />
-            <Text style={{color: 'grey'}}>Deliveroo</Text>
+          <View style={styles.headerContainer2}>
+            {/* <Image style={styles.profileImage} source={FinalMe} /> */}
+            {userImage ? (
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Image style={styles.profileImage} source={{uri: userImage}} />
+                <Text style={{color: 'grey'}}>{username}</Text>
+              </View>
+            ) : (
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Ionicons
+                  name="person-circle-outline"
+                  size={50}
+                  color="grey"
+                  style={styles.avatar}
+                />
+                <Text style={{color: 'grey'}}>{username}</Text>
+              </View>
+            )}
+            <TouchableOpacity onPress={() => handleDelete()}>
+              <Ionicons
+                name="trash-outline"
+                size={30}
+                color="grey"
+                style={styles.delete}
+              />
+            </TouchableOpacity>
           </View>
-          <Image style={styles.servicePhoto} source={DeliveryPhoto} />
+          <Image style={styles.servicePhoto} source={{uri: serviceImage}} />
           <Text
             style={{
               marginTop: 20,
@@ -24,7 +77,7 @@ const Service = () => {
               fontStyle: 'italic',
               fontWeight: '500',
             }}>
-            Food Delivery Around Campus
+            {title}
           </Text>
           <Text
             style={{
@@ -33,61 +86,74 @@ const Service = () => {
               fontStyle: 'italic',
               fontWeight: '500',
             }}>
-            $20
+            ${price}
           </Text>
-          <Text style={{marginTop: 20}}>
-            Get you're food delivered to you anywhere around campus. Contact us
-            at 123-456-7321 with your order and where you would like it
-            delivered. Delivery pass is 20 dollars per month
-          </Text>
+          <Text style={{marginTop: 20}}>{description}</Text>
         </View>
       </TouchableOpacity>
+    );
+  } else {
+    return (
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('StoreProfile', {
+            username: username,
+            userImage: userImage,
+            userBio: userBio,
+          })
+        }>
+        <View style={styles.container}>
+          <View style={styles.headerContainer}>
+            {/* <Image style={styles.profileImage} source={FinalMe} /> */}
+            {userImage ? (
+              <Image style={styles.profileImage} source={{uri: userImage}} />
+            ) : (
+              <Ionicons
+                name="person-circle-outline"
+                size={50}
+                color="grey"
+                style={styles.avatar}
+              />
+            )}
 
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <Image style={styles.profileImage} source={FinalMe} />
-          <Text style={{color: 'grey'}}>Freshly Baked Goods</Text>
+            <Text style={{color: 'grey'}}>{username}</Text>
+          </View>
+          <Image style={styles.servicePhoto} source={{uri: serviceImage}} />
+          <Text
+            style={{
+              marginTop: 20,
+              fontSize: 20,
+              fontStyle: 'italic',
+              fontWeight: '500',
+            }}>
+            {title}
+          </Text>
+          <Text
+            style={{
+              marginTop: 10,
+              fontSize: 16,
+              fontStyle: 'italic',
+              fontWeight: '500',
+            }}>
+            ${price}
+          </Text>
+          <Text style={{marginTop: 20}}>{description}</Text>
         </View>
-        <Image style={styles.servicePhoto} source={Cookies} />
-        <Text
-          style={{
-            marginTop: 20,
-            fontSize: 20,
-            fontStyle: 'italic',
-            fontWeight: '500',
-          }}>
-          Campus Baked Cookies
-        </Text>
-        <Text
-          style={{
-            marginTop: 10,
-            fontSize: 16,
-            fontStyle: 'italic',
-            fontWeight: '500',
-          }}>
-          $1
-        </Text>
-        <Text style={{marginTop: 20}}>
-          Selling Baked cookies around campus. Call us at 123-456-7899. $1 per 1
-          - $4 for 6 - $8 for 12
-        </Text>
-      </View>
-    </View>
-  );
+      </TouchableOpacity>
+    );
+  }
 };
 
 export default Service;
 
 const styles = StyleSheet.create({
   container: {
-    // borderRadius: 60,
     borderWidth: 1,
     borderColor: 'grey',
     justifyContent: 'flex-start',
-    // alignItems: "center",
-    flexDirection: 'column',
     margin: 20,
-    padding: 20,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
     shadowColor: 'black',
     shadowOpacity: 0.6,
     backgroundColor: '#FFF',
@@ -97,9 +163,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
+
     position: 'relative',
   },
+  headerContainer2: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+
+    position: 'relative',
+  },
+  // delete: {
+  //   left: '100%',
+  // },
   profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginHorizontal: 10,
+  },
+  avatar: {
     width: 50,
     height: 50,
     borderRadius: 25,
@@ -109,7 +192,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 250,
     alignSelf: 'center',
-    marginTop: 20,
+    marginTop: 10,
     shadowColor: 'black',
     shadowOpacity: 0.8,
     borderWidth: 1,
