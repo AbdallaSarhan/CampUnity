@@ -29,9 +29,9 @@ const styles = StyleSheet.create({
     // flexDirection: "row",
     // alignItems: "center",
     // justifyContent: "space-between",
-    marginBottom: 10,
+    // marginBottom: 10,
 
-    backgroundColor: '#cc0000',
+    backgroundColor: '#e63629',
   },
   headerInfo: {
     flexDirection: 'row',
