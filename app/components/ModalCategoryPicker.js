@@ -10,7 +10,7 @@ import React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const OPTIONS = {
-  Clothing: 'shirt-outline',
+  Apparel: 'shirt-outline',
   Furniture: 'bed-outline',
   'School Supplies': 'pencil-outline',
   Textbooks: 'book-outline',

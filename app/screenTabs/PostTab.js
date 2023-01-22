@@ -1,153 +1,205 @@
 import {
   StyleSheet,
   View,
-  Image,
   TextInput,
   TouchableOpacity,
   Text,
   ScrollView,
-  Button,
+  SafeAreaView,
+  KeyboardAvoidingView,
 } from 'react-native';
-import React, {useState} from 'react';
-// import * as ImagePicker from "expo-image-picker";
-import Ionicons from 'react-native-vector-icons/Ionicons';
-// import SelectComponent from "../SelectComponent";
-import {SafeAreaView} from 'react-native-safe-area-context';
+import React, {useState, useEffect} from 'react';
+import CheckBox from '@react-native-community/checkbox';
 import SelectComponent from '../components/SelectComponent';
-// import Checkbox from "expo-checkbox";
+import CurrencyInput from 'react-native-currency-input';
+import ImageUpload from '../components/ImageUpload';
+import useStorage from '../hooks/useStorage';
+import * as Progress from 'react-native-progress';
 
 const Post = () => {
-  const [image, setImage] = useState(null);
-  const [isChecked, setIsChecked] = useState(false);
   const [category, setCategory] = useState(null);
+  const [image, setImage] = useState(null);
+  const [title, setTitle] = useState(null);
+  const [description, setDescription] = useState(null);
+  const [price, setPrice] = useState(null);
+  const [service, setService] = useState(false);
+  const [product, setProduct] = useState(false);
+  const {saveService, saveProduct, transferred, uploading} = useStorage();
 
-  // const pickImage = async () => {
-  //   // No permissions request is necessary for launching the image library
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
-  //     allowsEditing: true,
-  //     aspect: [4, 3],
-  //     quality: 1,
-  //   });
+  const toggleServiceCheckBox = newValue => {
+    setService(newValue);
+    setProduct(!newValue);
+  };
+  const toggleProductCheckBox = newValue => {
+    setProduct(newValue);
+    setService(!newValue);
+  };
 
-  //   console.log(result);
+  const handleServicePost = () => {
+    if (service && price && title && description && image) {
+      saveService(title, description, price, image);
+      setImage(null);
+      setPrice(null);
+      setTitle(null);
+      setDescription(null);
+      setService(false);
+      setProduct(false);
+    } else {
+      alert('Please fill all the fields');
+    }
+  };
+  const handleProductPost = () => {
+    if (product && price && title && description && image && category) {
+      saveProduct(title, description, price, image, category);
+      setImage(null);
+      setPrice(null);
+      setTitle(null);
+      setDescription(null);
+      setService(false);
+      setProduct(false);
+      setCategory(null);
+    } else {
+      alert('Please fill all the fields');
+    }
+  };
 
-  //   if (!result.canceled) {
-  //     setImage(result.assets[0].uri);
-  //   }
-  // };
-
+  useEffect(() => {
+    console.log(image);
+  }, [image]);
   return (
     <SafeAreaView>
-      <ScrollView>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: 40,
-          }}>
-          {image ? (
-            <TouchableOpacity>
-              <Image
-                source={{uri: image}}
-                style={{width: 250, height: 200, marginTop: 20}}
-              />
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.picturePlaceholder}>
-              <TouchableOpacity
-                style={{alignItems: 'center', justifyContent: 'center'}}>
-                <Text style={{color: 'grey'}}> Choose Image</Text>
-                <Ionicons
-                  // style={{ left: 100 }}
-                  name="md-camera"
-                  size={45}
-                  color="grey"
-
-                  // color="black"
-                />
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-        <TextInput
-          placeholder="Title of Product/Service"
-          style={{
-            padding: 25,
-            backgroundColor: 'white',
-            borderColor: '#c0c1c2',
-            borderWidth: 0.5,
-            fontSize: 16,
-            // borderColor: "white",
-            width: '100%',
-          }}
-        />
-        <TextInput
-          placeholder="Description"
-          multiline={true}
-          numberOfLines={100}
-          style={{
-            padding: 25,
-            paddingTop: 20,
-            height: 200,
-
-            backgroundColor: 'white',
-            borderColor: '#c0c1c2',
-            borderWidth: 0.5,
-            width: '100%',
-            fontSize: 16,
-          }}
-        />
-        <View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <ScrollView>
+          <ImageUpload image={image} setImage={setImage} />
           <TextInput
-            placeholder="Price"
-            defaultValue="0.00"
+            placeholder="Title of Product/Service"
+            value={title}
+            onChangeText={text => setTitle(text)}
             style={{
               padding: 25,
-              marginLeft: '50%',
               backgroundColor: 'white',
               borderColor: '#c0c1c2',
               borderWidth: 0.5,
-              marginTop: 25,
-              width: '40%',
+              fontSize: 16,
+              width: '100%',
             }}
           />
-        </View>
-        <SelectComponent setCategory={setCategory} />
-
-        <View
-          style={{
-            marginTop: 30,
-            width: '70%',
-            alignSelf: 'center',
-          }}>
-          <Button
-            title="Post"
-            btnLabel={'Post'}
-            bgColor={'#cc0000'}
-            fontWeight="600"
-            fontSize="25"
-            textColor="white"
-            onPress={() => console.log(category)}
+          <TextInput
+            placeholder="Description"
+            multiline={true}
+            numberOfLines={100}
+            value={description}
+            onChangeText={text => setDescription(text)}
+            style={{
+              padding: 25,
+              paddingTop: 20,
+              height: 200,
+              backgroundColor: 'white',
+              borderColor: '#c0c1c2',
+              borderWidth: 0.5,
+              width: '100%',
+              fontSize: 16,
+            }}
           />
-        </View>
-      </ScrollView>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 20,
+              }}>
+              <Text style={{marginRight: 10}}>Service</Text>
+              <CheckBox
+                disabled={false}
+                value={service}
+                onValueChange={newValue => toggleServiceCheckBox(newValue)}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 20,
+              }}>
+              <Text style={{marginRight: 10}}>Product</Text>
+              <CheckBox
+                disabled={false}
+                value={product}
+                onValueChange={newValue => toggleProductCheckBox(newValue)}
+              />
+            </View>
+          </View>
+          {product ? <SelectComponent setCategory={setCategory} /> : null}
+          <View
+            style={{
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <CurrencyInput
+              placeholder="Price"
+              value={price}
+              onChangeValue={setPrice}
+              prefix="$"
+              delimiter=","
+              separator="."
+              precision={2}
+              minValue={0}
+              style={{
+                padding: 25,
+                backgroundColor: 'white',
+                borderColor: '#c0c1c2',
+                borderWidth: 0.5,
+                alignSelf: 'center',
+                width: '50%',
+                margin: 30,
+              }}
+            />
+            {uploading ? (
+              <View style={styles.progressBarContainer}>
+                <Progress.Bar
+                  progress={transferred}
+                  width={300}
+                  style={{padding: 10}}
+                />
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={{
+                  padding: 10,
+                  backgroundColor: '#e63629',
+                  width: '100%',
+                  alignItems: 'center',
+                  borderRadius: 20,
+                }}
+                onPress={() => {
+                  service ? handleServicePost() : handleProductPost();
+                }}>
+                <Text
+                  style={{
+                    fontWeight: '500',
+                    fontSize: 25,
+                    color: '#f2f2f2',
+                  }}>
+                  Post
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
 export default Post;
 
-const styles = StyleSheet.create({
-  picturePlaceholder: {
-    backgroundColor: '#e1e3e3',
-    borderColor: '#c0c1c2',
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    width: 250,
-    height: 200,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-});
+const styles = StyleSheet.create({});

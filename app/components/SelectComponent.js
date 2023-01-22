@@ -34,7 +34,6 @@ const SelectComponent = props => {
       </TouchableOpacity>
 
       <Modal
-        transparent={true}
         animationType="slide"
         visible={isModalVisible}
         onRequestClose={() => changeModalVisibility(false)}>
