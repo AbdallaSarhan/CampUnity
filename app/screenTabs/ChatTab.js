@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
     // marginTop: ,
-    backgroundColor: '#cc0000',
+    backgroundColor: '#e63629',
   },
   headerText: {
     fontSize: 22,
